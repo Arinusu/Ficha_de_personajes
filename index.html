@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#4fb8a0">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="Ficha">
+  <link rel="manifest" href="manifest.json">
+  <title>Ficha de Personaje</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: #e8f7f2; min-height: 100vh; padding: 16px; font-family: 'Comic Sans MS', 'Chalkboard SE', cursive; }
+    .sheet { background: #f0f9f5; border: 2px solid #a8d5c2; border-radius: 16px; padding: 16px; }
+    .top-section { display: flex; gap: 12px; margin-bottom: 14px; }
+    .avatar-circle { width: 120px; height: 120px; border-radius: 50%; border: 2px solid #c0d8cc; background: white; flex-shrink: 0; overflow: hidden; display: flex; align-items: center; justify-content: center; cursor: pointer; position: relative; }
+    .avatar-circle img { width: 100%; height: 100%; object-fit: cover; display: none; }
+    .avatar-upload { position: absolute; inset: 0; opacity: 0; cursor: pointer; z-index: 2; }
+    .traits { display: flex; flex-direction: column; gap: 8px; flex: 1; }
+    .trait-row { display: flex; align-items: center; gap: 8px; }
+    .trait-label { font-size: 13px; color: #e07a9c; font-weight: bold; min-width: 42px; text-align: right; }
+    .color-box { width: 44px; height: 30px; border-radius: 6px; border: none; cursor: pointer; padding: 2px; }
+    .fi { width: 100%; background: #fffde8; border: none; border-radius: 8px; padding: 6px 10px; font-family: inherit; font-size: 14px; color: #5a9a8a; outline: none; }
+    .fi:focus { box-shadow: 0 0 0 2px #4fb8a0; }
+    .field-row { margin-bottom: 9px; }
+    .fl { font-size: 13px; color: #4fb8a0; font-weight: bold; margin-bottom: 3px; }
+    .hi { background: #4fd8c4; border-radius: 10px; padding: 7px 10px; margin-bottom: 10px; }
+    .hi .fi { background: transparent; color: #1a5a50; font-weight: bold; padding: 0; }
+    .side-box { width: 96px; height: 96px; background: #fffde8; border-radius: 10px; border: none; resize: none; font-family: inherit; font-size: 13px; color: #5a9a8a; padding: 8px; outline: none; }
+    .mid-section { display: flex; gap: 8px; align-items: flex-start; margin-bottom: 10px; }
+    .mid-fields { flex: 1; }
+    .name-bar { background: #fffde8; border-radius: 10px; padding: 6px 10px; margin-bottom: 12px; }
+    .name-bar .fi { background: transparent; font-size: 16px; font-weight: bold; color: #4fb8a0; }
+    .export-btn { width: 100%; margin-top: 14px; padding: 10px; background: #4fb8a0; border: none; border-radius: 10px; font-family: inherit; font-size: 15px; font-weight: bold; color: white; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; }
+    .export-btn:active { opacity: 0.85; }
+    .status { text-align: center; font-size: 12px; color: #4fb8a0; margin-top: 6px; min-height: 18px; }
+    .preview-name { text-align: center; font-size: 12px; color: #aac8be; margin-top: 8px; letter-spacing: 1px; }
+  </style>
+</head>
+<body>
+
+<div class="sheet" id="sheet">
+  <div class="top-section">
+    <label style="cursor:pointer">
+      <div class="avatar-circle">
+        <div id="av-placeholder" style="text-align:center;padding:8px">
+          <i class="ti ti-camera" style="font-size:26px;color:#aac8be;display:block;margin-bottom:4px"></i>
+          <span style="font-size:11px;color:#aac8be">foto</span>
+        </div>
+        <img id="av-img">
+        <input type="file" accept="image/*" class="avatar-upload" onchange="loadAvatar(event)">
+      </div>
+    </label>
+    <div class="traits">
+      <div class="trait-row">
+        <span class="trait-label">cejas</span>
+        <input type="color" class="color-box" value="#b5ccb8">
+        <input class="fi" style="flex:1;background:#e8f4f0" placeholder="descripción..." id="t-cejas">
+      </div>
+      <div class="trait-row">
+        <span class="trait-label">ojos</span>
+        <input type="color" class="color-box" value="#b5ccb8">
+        <input class="fi" style="flex:1;background:#e8f4f0" placeholder="descripción..." id="t-ojos">
+      </div>
+      <div class="trait-row">
+        <span class="trait-label">Nariz</span>
+        <input type="color" class="color-box" value="#b5ccb8">
+        <input class="fi" style="flex:1;background:#e8f4f0" placeholder="descripción..." id="t-nariz">
+      </div>
+    </div>
+  </div>
+
+  <div class="name-bar">
+    <div class="fl">Name:</div>
+    <input class="fi" placeholder="Nombre del personaje" id="f-name" oninput="updatePreview()">
+  </div>
+
+  <div class="mid-section">
+    <div class="mid-fields">
+      <div class="field-row"><div class="fl">Species:</div><input class="fi" id="f-species" placeholder="" oninput="updatePreview()"></div>
+      <div class="field-row"><div class="fl">Gender:</div><input class="fi" id="f-gender" placeholder="" oninput="updatePreview()"></div>
+      <div class="field-row"><div class="fl">Age:</div><input class="fi" id="f-age" placeholder="" oninput="updatePreview()"></div>
+      <div class="field-row"><div class="fl">Kind:</div><input class="fi" id="f-kind" placeholder="" oninput="updatePreview()"></div>
+    </div>
+    <div style="display:flex;flex-direction:column;align-items:flex-end;gap:8px">
+      <textarea class="side-box" id="f-notes" placeholder="notas..."></textarea>
+      <span style="font-size:17px;font-weight:bold;color:#4fb8a0">Weapon</span>
+    </div>
+  </div>
+
+  <div class="hi">
+    <div class="fl" style="color:#1a5a50;font-size:12px;margin-bottom:2px">Empire:</div>
+    <input class="fi" id="f-empire" placeholder="" oninput="updatePreview()">
+  </div>
+
+  <div class="field-row"><div class="fl">Solar System:</div><input class="fi" id="f-solar" placeholder="" oninput="updatePreview()"></div>
+  <div class="field-row"><div class="fl">Planet:</div><input class="fi" id="f-planet" placeholder="" oninput="updatePreview()"></div>
+  <div class="field-row"><div class="fl">Relationship with:</div><input class="fi" id="f-rel" placeholder="" oninput="updatePreview()"></div>
+</div>
+
+<div class="preview-name" id="preview-name">nombre del archivo: ficha.jpg</div>
+<button class="export-btn" onclick="exportJPG()">
+  <i class="ti ti-download" style="font-size:18px"></i>
+  Exportar como JPG
+</button>
+<div class="status" id="status"></div>
+
+<script>
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('sw.js');
+}
+
+function getInitial(id) {
+  const val = (document.getElementById(id)||{}).value||'';
+  return val.trim() ? val.trim()[0].toUpperCase() : '_';
+}
+function buildFilename() {
+  const fields = ['f-name','f-species','f-gender','f-age','f-kind','f-empire','f-solar','f-planet','f-rel'];
+  return 'ficha_' + fields.map(id => getInitial(id)).join('');
+}
+function updatePreview() {
+  document.getElementById('preview-name').textContent = 'nombre del archivo: ' + buildFilename() + '.jpg';
+}
+function loadAvatar(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = ev => {
+    const img = document.getElementById('av-img');
+    img.src = ev.target.result;
+    img.style.display = 'block';
+    document.getElementById('av-placeholder').style.display = 'none';
+  };
+  reader.readAsDataURL(file);
+}
+function exportJPG() {
+  const status = document.getElementById('status');
+  status.textContent = 'Generando imagen...';
+  html2canvas(document.getElementById('sheet'), {
+    scale: 2, useCORS: true, backgroundColor: '#f0f9f5', logging: false,
+    onclone: function(doc) {
+      doc.querySelectorAll('#sheet input:not([type="color"]):not([type="file"]), #sheet textarea').forEach(el => {
+        const div = doc.createElement('div');
+        div.style.fontFamily = "'Comic Sans MS',cursive";
+        div.style.fontSize = getComputedStyle(el).fontSize;
+        div.style.color = el.value ? getComputedStyle(el).color : '#aac8be';
+        div.style.padding = '6px 10px';
+        div.style.minHeight = '28px';
+        div.style.wordBreak = 'break-word';
+        div.style.whiteSpace = 'pre-wrap';
+        div.style.width = '100%';
+        div.textContent = el.value || el.placeholder || '';
+        el.parentNode.replaceChild(div, el);
+      });
+      doc.querySelectorAll('#sheet input[type="color"]').forEach(el => {
+        const div = doc.createElement('div');
+        div.style.cssText = `width:44px;height:30px;border-radius:6px;background:${el.value};display:inline-block`;
+        el.parentNode.replaceChild(div, el);
+      });
+      doc.querySelectorAll('#sheet input[type="file"]').forEach(el => el.remove());
+    }
+  }).then(canvas => {
+    const filename = buildFilename() + '.jpg';
+    const a = document.createElement('a');
+    a.download = filename;
+    a.href = canvas.toDataURL('image/jpeg', 0.95);
+    a.click();
+    status.textContent = 'Guardado como ' + filename;
+    setTimeout(() => status.textContent = '', 3000);
+  }).catch(() => status.textContent = 'Error al exportar.');
+}
+</script>
+</body>
+</html>
