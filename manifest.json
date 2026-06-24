@@ -1,0 +1,21 @@
+{
+  "name": "Ficha de Personaje",
+  "short_name": "Ficha",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#e8f7f2",
+  "theme_color": "#4fb8a0",
+  "description": "Crea y exporta fichas de personaje",
+  "icons": [
+    {
+      "src": "https://via.placeholder.com/192x192/4fb8a0/ffffff?text=F",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "https://via.placeholder.com/512x512/4fb8a0/ffffff?text=F",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
